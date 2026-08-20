@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Manthan 6.0 | Biometric Inauguration — Dr. B.B. Hegde College</title>
+    <meta name="description" content="Official Biometric Palm Inauguration System for Tech Manthan 6.0 — Dr. B.B. Hegde First Grade College, Kundapura. BCA Department.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="TC1.png">
+    <link rel="shortcut icon" type="image/png" href="TC1.png">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- MediaPipe -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <!-- ═══════ BOOT SEQUENCE ═══════ -->
+    <div id="system-boot-screen" class="system-boot-screen">
+        <div class="boot-terminal">
+            <div class="boot-logo-glitch">
+                <img src="TC1.png" alt="Boot Logo">
+            </div>
+            <div id="boot-text-container"></div>
+            <div class="boot-cursor">_</div>
+        </div>
+    </div>
+
+    <!-- ═══════ LAYERED BACKGROUND ═══════ -->
+    <div class="aurora-layer"></div>
+    <div class="cyber-grid"></div>
+    <canvas id="particle-canvas"></canvas>
+    <div class="cyber-vignette"></div>
+    <div class="cyber-crt"></div>
+
+    <!-- Flash transition overlay (controlled by scanner.js) -->
+    <div class="ceremony-flash-overlay"></div>
+
+    <!-- ═══════ TOP HUD ═══════ -->
+    <header class="top-hud-bar">
+        <div class="brand-wrapper">
+            <img src="TC1.png" alt="Tech Manthan 6.0" class="brand-mini-logo">
+            <div class="brand-text">
+                <h2>TECH MANTHAN 6.0</h2>
+                <span>Dr. B.B. Hegde College &bull; Kundapura &bull; BCA</span>
+            </div>
+        </div>
+
+        <div class="hud-center-line">
+            <div class="hud-tick"></div><div class="hud-tick"></div><div class="hud-tick"></div>
+            <div class="hud-tick active"></div><div class="hud-tick"></div><div class="hud-tick"></div>
+            <div class="hud-tick"></div>
+        </div>
+
+        <div class="hud-right">
+            <div class="status-badge">
+                <span class="pulse-dot"></span>
+                <span id="telemetry-hash">BIOMETRIC ONLINE</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════ MAIN STAGE ═══════ -->
+    <main class="main-stage">
+
+        <!-- College Header Banner -->
+        <div class="college-header-badge">
+            <div class="chb-line"></div>
+            <span class="chb-text">Dr.B.B. HEGDE FIRST GRADE COLLEGE, KUNDAPURA</span>
+            <div class="chb-line"></div>
+        </div>
+
+        <!-- ─── STAGE GRID: Logo Panel (left) + Scanner (right) ─── -->
+        <div class="stage-grid">
+
+            <!-- ── LEFT: HOLOGRAPHIC LOGO + EVENT TITLE ── -->
+            <div class="logo-showcase-panel">
+
+                <!-- Orbiting Logo Engine -->
+                <div class="logo-holodeck">
+                    <!-- Decorative orbit rings -->
+                    <div class="holo-ring-outer"></div>
+                    <div class="holo-ring-middle"></div>
+                    <div class="holo-ring-inner"></div>
+
+                    <!-- Orbit dots -->
+                    <div class="orbit-dots">
+                        <span class="od od-1"></span>
+                        <span class="od od-2"></span>
+                        <span class="od od-3"></span>
+                    </div>
+
+                    <!-- Main Logo -->
+                    <img src="TC1.png" alt="Tech Manthan 6.0 Official Emblem"
+                        class="official-event-logo" id="official-logo">
+                </div>
+
+                <!-- Event Title Block -->
+                <div class="logo-info-caption">
+                    <p class="pre-title">✦ FLAGSHIP TECHNICAL SYMPOSIUM ✦</p>
+
+                    <h1 class="event-main-title">
+                        <span class="emt-tech">TECH</span>
+                        <span class="emt-manthan">MANTHAN</span>
+                        <span class="emt-version">6.0</span>
+                    </h1>
+
+                    <p class="event-motto">DIVIDED BY ZERO &nbsp;·&nbsp; UNITED BY ONE</p>
+                    <span class="department-tag">[ DEPARTMENT OF COMPUTER APPLICATIONS ]</span>
+
+                    <!-- Decorative stat chips -->
+                    <div class="stat-row">
+                        <div class="stat-chip">
+                            <span class="sc-val">20+</span>
+                            <span class="sc-lbl">EVENTS</span>
+                        </div>
+                        <div class="sc-sep"></div>
+                        <div class="stat-chip">
+                            <span class="sc-val">500+</span>
+                            <span class="sc-lbl">PARTICIPANTS</span>
+                        </div>
+                        <div class="sc-sep"></div>
+                        <div class="stat-chip">
+                            <span class="sc-val">₹50K+</span>
+                            <span class="sc-lbl">PRIZES</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /logo-showcase-panel -->
+
+            <!-- ── RIGHT: BIOMETRIC SCANNER ── -->
+            <div class="scanner-card">
+
+                <!-- HUD bracket corners -->
+                <div class="hud-corner top-left"></div>
+                <div class="hud-corner top-right"></div>
+                <div class="hud-corner bottom-left"></div>
+                <div class="hud-corner bottom-right"></div>
+
+                <!-- Card Header -->
+                <div class="scanner-header">
+                    <h3>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/>
+                            <line x1="21.17" y1="8" x2="11.99" y2="8"/>
+                            <line x1="3.95" y1="6.06" x2="8.54" y2="14"/>
+                            <line x1="10.88" y1="21.94" x2="15.46" y2="14"/>
+                        </svg>
+                        BIOMETRIC PALM SENSOR
+                    </h3>
+                    <div class="status-badge sm">
+                        <span class="pulse-dot"></span>
+                        <span>ACTIVE</span>
+                    </div>
+                </div>
+
+                <!-- Instruction -->
+                <p class="scanner-instruction">
+                    Place your palm in the camera frame and hold steady for <strong>2 seconds</strong> to reveal the event portal
+                </p>
+
+                <!-- Camera Viewport -->
+                <div class="camera-viewport">
+                    <video id="camera-video" playsinline autoplay muted></video>
+                    <canvas id="biometric-canvas"></canvas>
+
+                    <!-- Animated laser line -->
+                    <div class="laser-scan-line"></div>
+
+                    <!-- Reticle + palm guide -->
+                    <div class="palm-target-overlay">
+                        <svg class="palm-svg-guide" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                            <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <!-- Palm -->
+                                <rect x="25" y="65" width="50" height="50" rx="10" stroke-width="1.5"/>
+                                <!-- Thumb -->
+                                <rect x="10" y="50" width="17" height="30" rx="8" stroke-width="1.5"/>
+                                <!-- Index -->
+                                <rect x="25" y="30" width="12" height="40" rx="6" stroke-width="1.5"/>
+                                <!-- Middle -->
+                                <rect x="39" y="20" width="12" height="50" rx="6" stroke-width="1.5"/>
+                                <!-- Ring -->
+                                <rect x="53" y="27" width="12" height="42" rx="6" stroke-width="1.5"/>
+                                <!-- Pinky -->
+                                <rect x="67" y="38" width="10" height="30" rx="5" stroke-width="1.5"/>
+                                <!-- Corner reticle marks -->
+                                <path d="M5 20 L5 5 L20 5" stroke-width="2"/>
+                                <path d="M80 5 L95 5 L95 20" stroke-width="2"/>
+                                <path d="M5 100 L5 115 L20 115" stroke-width="2"/>
+                                <path d="M80 115 L95 115 L95 100" stroke-width="2"/>
+                            </g>
+                        </svg>
+                        <span class="reticle-label">ALIGN PALM HERE</span>
+                    </div>
+
+                    <!-- Telemetry readout inside camera -->
+                    <div class="telemetry-readout">
+                        <span id="telemetry-status">ALIGN PALM IN RETICLE (2s SCAN)</span>
+                        <span id="telemetry-density">DERMAL: 99.4%</span>
+                    </div>
+                </div>
+
+                <!-- Authentication Progress -->
+                <div class="scan-progress-wrapper">
+                    <div class="progress-labels">
+                        <span>AUTHENTICATION PROTOCOL (2.0s)</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <!-- Step indicators -->
+                    <div class="progress-steps">
+                        <span class="ps" id="ps-detect">DETECT</span>
+                        <span class="ps-dot">◆</span>
+                        <span class="ps" id="ps-analyze">ANALYZE</span>
+                        <span class="ps-dot">◆</span>
+                        <span class="ps" id="ps-verify">VERIFY</span>
+                        <span class="ps-dot">◆</span>
+                        <span class="ps" id="ps-grant">GRANT</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="scanner-actions">
+                    <button class="cyber-btn-primary" id="manualScanBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/>
+                            <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/>
+                            <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/>
+                            <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
+                        </svg>
+                        HOLD PALM 2s TO SCAN
+                    </button>
+                    <button class="cyber-btn-secondary" id="instantRevealBtn" title="Instant Reveal">
+                        ⚡ REVEAL
+                    </button>
+                </div>
+
+                <!-- Security note -->
+                <p class="bio-security-note">
+                    🔒 LOCAL PROCESSING · NO DATA TRANSMITTED · AES-256 ENCRYPTED
+                </p>
+
+            </div><!-- /scanner-card -->
+
+        </div><!-- /stage-grid -->
+
+        <!-- ═══════ GRAND REVEAL STAGE ═══════ -->
+        <div class="reveal-unveiled-stage">
+            <div class="revealed-website-container">
+                <iframe src="/api/proxy-home" id="revealedIframe"
+                    class="revealed-website-iframe"
+                    title="Tech Manthan 6.0 Official Website"></iframe>
+
+                <!-- Virtual Cursor -->
+                <div id="virtualCursor" class="virtual-cyber-cursor">
+                    <div class="cursor-pointer">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2.5">
+                            <polygon points="3 3, 10 21, 14 14, 21 10"
+                                fill="rgba(0,243,255,0.35)" stroke="#00f3ff"/>
+                        </svg>
+                    </div>
+                    <div class="cursor-ring"></div>
+                    <div class="cursor-pulse"></div>
+                    <div class="cursor-label" id="cursorLabel">CARD SELECTOR</div>
+                </div>
+            </div>
+
+            <!-- Subtitle bar -->
+            <div id="ceremonySubtitleBar" class="ceremony-subtitle-bar">
+                <div class="subtitle-badge">
+                    <span class="pulse-dot"></span> AUDIO TOUR
+                </div>
+                <div id="subtitleText" class="subtitle-text">INITIALIZING CEREMONY...</div>
+            </div>
+        </div>
+
+    </main><!-- /main-stage -->
+
+    <!-- ═══════ PORTAL PREVIEW MODAL ═══════ -->
+    <div class="modal-overlay" id="portalModal">
+        <div class="modal-portal-content">
+            <div class="modal-header-bar">
+                <h4>🌐 TECH MANTHAN 6.0 — LIVE PORTAL PREVIEW</h4>
+                <button class="modal-close-btn" id="closePortalModalBtn">&times;</button>
+            </div>
+            <iframe src="https://tech.manthana.bbhegdecollege.com/home.html"
+                class="portal-iframe" title="Tech Manthan 6.0 Official Website"></iframe>
+        </div>
+    </div>
+
+    <!-- ═══════ SCRIPTS ═══════ -->
+    <script src="bootsequence.js"></script>
+    <script src="particles.js"></script>
+    <script src="audio.js"></script>
+    <script src="scanner.js"></script>
+
+</body>
+</html>
