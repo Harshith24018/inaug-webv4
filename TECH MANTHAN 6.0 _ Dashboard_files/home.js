@@ -580,11 +580,11 @@ function renderEvents() {
       modal.classList.add("active");
     };
 
-    const posterSrc = ev.poster || 'TC1.png';
+    const posterSrc = ev.poster || 'TM6_logo.png';
     const safeTitle = (ev.title || "Event").replace(/'/g, "\\'");
     const posterHTML = `
       <div style="position: relative; width: 100%; height: 320px; margin-bottom: 15px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(0, 243, 255, 0.3); box-shadow: 0 4px 18px rgba(0, 243, 255, 0.15); background: rgba(5, 8, 20, 0.95);">
-        <img src="${posterSrc}" class="event-card-poster" alt="${ev.title} poster" loading="eager" decoding="async" onclick="openPosterLightbox('${posterSrc}', '${safeTitle}')" style="width: 100%; height: 100%; object-fit: contain; object-position: center; cursor: pointer; transition: transform 0.3s ease;" onerror="this.onerror=null; this.src='TC1.png';" title="Click to view full poster">
+        <img src="${posterSrc}" class="event-card-poster" alt="${ev.title} poster" loading="eager" decoding="async" onclick="openPosterLightbox('${posterSrc}', '${safeTitle}')" style="width: 100%; height: 100%; object-fit: contain; object-position: center; cursor: pointer; transition: transform 0.3s ease;" onerror="this.onerror=null; this.src='TM6_logo.png';" title="Click to view full poster">
         <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(0, 243, 255, 0.5); font-size: 0.72rem; color: var(--neon-cyan); font-family: 'Orbitron', monospace; pointer-events: none; text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);">🔍 VIEW POSTER</div>
       </div>
     `;
