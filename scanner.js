@@ -159,6 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn("MediaPipe Hands CDN load warning. Using optical engine.", e);
         }
     }
+    
+    let lastHandSeenTime = 0; // Added for grace period
 
     function onHandResults(results) {
         if (!ctx || isRevealed) return;
@@ -166,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             handDetected = true;
+            lastHandSeenTime = performance.now();
             handLandmarks = results.multiHandLandmarks[0];
             drawCyberHand(handLandmarks);
             
@@ -174,6 +177,14 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             handDetected = false;
             handLandmarks = null;
+            
+            // If we were locked on, but the hand disappears, wait 500ms before aborting 
+            // (MediaPipe often drops single frames, this prevents it from being impossible)
+            if (isPalmScanLocked && !isRevealed) {
+                if (performance.now() - lastHandSeenTime > 500) {
+                    abortPalmScan();
+                }
+            }
         }
     }
 
@@ -338,6 +349,17 @@ document.addEventListener('DOMContentLoaded', () => {
         runContinuousScanLoop();
     }
 
+    function abortPalmScan() {
+        if (isRevealed) return;
+        isPalmScanLocked = false;
+        scanProgress = 0;
+        updateProgressUI();
+        if (palmGuide) palmGuide.classList.remove('scanning');
+        if (officialLogo) officialLogo.classList.remove('scanning-pulse');
+        particles.setVortex(false, 1);
+        console.log("[-] PALM LOST // SCAN ABORTED");
+    }
+
     function runContinuousScanLoop() {
         if (isRevealed || !isPalmScanLocked) return;
 
@@ -424,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function stopManualHold() {
-        // Maintained for touch listeners
+        abortPalmScan();
     }
 
     if (manualScanBtn) {
@@ -541,8 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Wait 4 seconds for user to see the success screen, then redirect
             setTimeout(() => {
-                // We will replace this URL when the official one is provided
-                window.location.href = "https://tech.manthana.bbhegdecollege.com/home.html"; 
+                window.location.href = "TECH MANTHAN 6.0 _ Dashboard.html"; 
             }, 4000);
             
         }, 600);
