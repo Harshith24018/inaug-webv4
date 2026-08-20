@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="./TECH MANTHAN 6.0 _ Dashboard_files/style.css">
     <link rel="icon" type="image/png" href="./TECH MANTHAN 6.0 _ Dashboard_files/TM6_logo.png">
     <link rel="shortcut icon" type="image/png" href="./TECH MANTHAN 6.0 _ Dashboard_files/TM6_logo.png">
+    <!-- ResponsiveVoice: Indian Male TTS -->
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=FREE"></script>
 <style>
         #cyber-canvas {
             position: fixed;
@@ -1182,8 +1184,6 @@ WhatsApp:
     <!-- AUDIO TOUR AUTOMATION ENGINE -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            if (!window.speechSynthesis) return;
-
             const cursor = document.getElementById('virtualCursor');
             if (!cursor) return;
 
@@ -1203,26 +1203,42 @@ WhatsApp:
                 { id: 'card-videography', name: 'Videography' }
             ];
 
-            let synth = window.speechSynthesis;
-            
-            function getVoice() {
-                const voices = synth.getVoices();
-                return voices.find(v => v.name.toLowerCase().includes('google uk english female') || v.name.toLowerCase().includes('zira')) || voices[0];
+            // --- Genuine Indian Male Voice (Microsoft Ravi) ---
+            function getIndianMaleVoice() {
+                const voices = window.speechSynthesis.getVoices();
+                return (
+                    voices.find(v => v.name === 'Microsoft Ravi - English (India)') ||
+                    voices.find(v => v.name === 'Microsoft Ravi Desktop - English (India)') ||
+                    voices.find(v => v.name.includes('Ravi')) ||
+                    voices.find(v => v.name.includes('Prabhat')) ||
+                    voices.find(v => v.lang === 'en-IN' && !v.name.toLowerCase().includes('heera') && !v.name.toLowerCase().includes('female')) ||
+                    voices.find(v => v.lang === 'en-IN')
+                );
             }
 
             function speak(text, callback) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                const voice = getVoice();
-                if (voice) utterance.voice = voice;
-                utterance.pitch = 0.8;
-                utterance.rate = 0.9; // medium/slow speed
-                utterance.volume = 1;
-                
-                if (callback) {
-                    utterance.onend = callback;
+                window.speechSynthesis.cancel();
+                const doSpeak = () => {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    const voice = getIndianMaleVoice();
+                    if (voice) utterance.voice = voice;
+                    utterance.lang = 'en-IN';
+                    utterance.pitch = 0.85;
+                    utterance.rate = 0.88;
+                    utterance.volume = 1;
+                    if (callback) utterance.onend = callback;
+                    window.speechSynthesis.speak(utterance);
+                };
+                if (window.speechSynthesis.getVoices().length > 0) {
+                    doSpeak();
+                } else {
+                    window.speechSynthesis.onvoiceschanged = () => {
+                        window.speechSynthesis.onvoiceschanged = null;
+                        doSpeak();
+                    };
                 }
-                synth.speak(utterance);
             }
+
 
             // Initialization delay
             setTimeout(() => {

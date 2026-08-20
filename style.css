@@ -1234,9 +1234,10 @@ body.booting .top-hud-bar, body.booting .main-stage {
     gap: 20px;
 }
 .boot-logo-glitch {
-    width: 65px;
-    height: 65px;
-    margin-bottom: 10px;
+    width: 250px;
+    height: 250px;
+    margin-bottom: 40px;
+    align-self: center;
     animation: bootGlitch 2s infinite alternate;
 }
 .boot-logo-glitch img {
@@ -1247,9 +1248,9 @@ body.booting .top-hud-bar, body.booting .main-stage {
     filter: drop-shadow(0 0 10px var(--cyan));
 }
 @keyframes bootGlitch {
-    0% { filter: drop-shadow(0 0 10px var(--cyan)) hue-rotate(0deg); opacity: 1; }
-    50% { filter: drop-shadow(0 0 15px var(--cyan)) hue-rotate(90deg); opacity: 0.8; }
-    100% { filter: drop-shadow(0 0 10px var(--cyan)) hue-rotate(0deg); opacity: 1; }
+    0% { filter: drop-shadow(0 0 10px var(--cyan)); opacity: 1; }
+    50% { filter: drop-shadow(0 0 25px var(--cyan)); opacity: 0.8; }
+    100% { filter: drop-shadow(0 0 10px var(--cyan)); opacity: 1; }
 }
 #boot-text-container {
     display: flex;

@@ -203,33 +203,44 @@ class SciFiAudioEngine {
         }
     }
 
-    // Speech Synthesis Engine for Guided Voice Ceremony Tour
+    // Speech Synthesis Engine — Genuine Indian Male Voice
     speakText(text, onEnd) {
-        if (!('speechSynthesis' in window)) {
-            if (onEnd) onEnd();
-            return;
-        }
-
         try {
             window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 0.95;
-            utterance.pitch = 1.05;
-            utterance.volume = 1.0;
 
-            const voices = window.speechSynthesis.getVoices();
-            const preferredVoice = voices.find(v => v.lang && v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Zira') || v.name.includes('Samantha') || v.name.includes('David')));
-            if (preferredVoice) utterance.voice = preferredVoice;
+            const doSpeak = () => {
+                const voices = window.speechSynthesis.getVoices();
 
-            utterance.onend = () => {
-                if (onEnd) onEnd();
+                // Priority list: genuine Indian male voices (Windows + Chrome + macOS)
+                const indianMale =
+                    voices.find(v => v.name === 'Microsoft Ravi - English (India)') ||       // Windows 10/11 built-in Indian male
+                    voices.find(v => v.name === 'Microsoft Ravi Desktop - English (India)') || // Windows Desktop variant
+                    voices.find(v => v.name.includes('Ravi')) ||                              // Any Ravi
+                    voices.find(v => v.name.includes('Prabhat')) ||                           // Chrome Indian male
+                    voices.find(v => v.name.includes('en-IN') && v.name.toLowerCase().includes('male')) ||
+                    voices.find(v => v.lang === 'en-IN' && !v.name.toLowerCase().includes('heera') && !v.name.toLowerCase().includes('female')) || // en-IN, exclude female
+                    voices.find(v => v.lang === 'en-IN');                                     // Any Indian English as last resort
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                if (indianMale) utterance.voice = indianMale;
+                utterance.lang = 'en-IN';
+                utterance.rate = 0.88;
+                utterance.pitch = 0.85;
+                utterance.volume = 1.0;
+                utterance.onend = () => { if (onEnd) onEnd(); };
+                utterance.onerror = () => { if (onEnd) onEnd(); };
+                window.speechSynthesis.speak(utterance);
             };
 
-            utterance.onerror = () => {
-                if (onEnd) onEnd();
-            };
-
-            window.speechSynthesis.speak(utterance);
+            // Voices may not be loaded yet — wait if needed
+            if (window.speechSynthesis.getVoices().length > 0) {
+                doSpeak();
+            } else {
+                window.speechSynthesis.onvoiceschanged = () => {
+                    window.speechSynthesis.onvoiceschanged = null;
+                    doSpeak();
+                };
+            }
         } catch (e) {
             if (onEnd) onEnd();
         }

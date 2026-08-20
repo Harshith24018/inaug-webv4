@@ -1,0 +1,19 @@
+# Environment variables
+.env
+.env.local
+.env.production
+
+# API keys / secrets
+*.key
+secrets.js
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Node (if ever used)
+node_modules/
