@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    body { background: black; margin: 0; overflow: hidden; }
+    canvas { display: block; }
+</style>
+</head>
+<body>
+    <canvas id="particle-canvas"></canvas>
+    <script src="particles.js"></script>
+    <script>
+        // Manually instantiate since scanner.js isn't here
+        new window.ParticleEngine('particle-canvas');
+    </script>
+</body>
+</html>

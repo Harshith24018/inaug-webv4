@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 bootScreen.classList.add("fade-out");
                 setTimeout(() => {
                     bootScreen.style.display = "none";
+                    document.body.classList.remove('booting');
                     window.bootIsComplete = true;
                     document.dispatchEvent(new Event('bootComplete'));
                 }, 800);

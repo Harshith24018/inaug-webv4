@@ -195,6 +195,7 @@ body::before {
 .brand-mini-logo {
     width: 42px; height: 42px;
     object-fit: contain;
+    border-radius: 50%;
     filter: drop-shadow(0 0 8px var(--cyan));
     animation: spinLogo 25s linear infinite;
     flex-shrink: 0;
@@ -755,15 +756,7 @@ body::before {
 
 /* Palm guide overlay */
 .palm-target-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    z-index: 6;
-    gap: 10px;
+    display: none !important;
 }
 
 .palm-svg-guide {
@@ -1212,7 +1205,7 @@ body::before {
 .system-boot-screen {
     position: fixed;
     inset: 0;
-    background: #02050A;
+    background: transparent;
     z-index: 99999;
     display: flex;
     flex-direction: column;
@@ -1225,6 +1218,12 @@ body::before {
     opacity: 0;
     transform: scale(1.1);
     pointer-events: none;
+}
+
+body.booting .top-hud-bar, body.booting .main-stage {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 1.2s ease-in-out;
 }
 .boot-terminal {
     width: 90%;
@@ -1244,6 +1243,7 @@ body::before {
     width: 100%;
     height: 100%;
     object-fit: contain;
+    border-radius: 50%;
     filter: drop-shadow(0 0 10px var(--cyan));
 }
 @keyframes bootGlitch {
