@@ -523,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
             requestAnimationFrame(step);
         }
 
-        // 6. Unveil stage inside index.html, speak motto, and auto-scroll down to Events Directory cards
+        // 6. Transition to "Access Granted" screen and redirect
         setTimeout(() => {
             if (stageGrid) stageGrid.style.display = 'none';
             const topBar = document.querySelector('.top-hud-bar');
@@ -535,25 +535,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 revealUnveiled.style.display = 'flex';
             }
 
-            const revealedIframe = document.getElementById('revealedIframe');
-            if (revealedIframe) {
-                revealedIframe.style.transform = 'translateY(0)';
-            }
-
-            const autoScrollToEvents = () => {
-                setTimeout(() => {
-                    if (revealedIframe) {
-                        // Smoothly glides down over 4.5 seconds to reveal CAN-YOU-C, NRUTYANJALI, RANASANGRAMA event cards
-                        revealedIframe.style.transform = 'translateY(-640px)';
-                    }
-                }, 1200);
-            };
-
             if (audio) {
-                audio.speakText("TECH MANTHAN 6.0 — DIVIDED BY ZERO, UNITED BY ONE.", autoScrollToEvents);
-            } else {
-                autoScrollToEvents();
+                audio.speakText("ACCESS GRANTED. REDIRECTING TO TECH MANTHAN 6.0 MAINFRAME.");
             }
+
+            // Wait 4 seconds for user to see the success screen, then redirect
+            setTimeout(() => {
+                // We will replace this URL when the official one is provided
+                window.location.href = "https://tech.manthana.bbhegdecollege.com/home.html"; 
+            }, 4000);
+            
         }, 600);
     }
 
