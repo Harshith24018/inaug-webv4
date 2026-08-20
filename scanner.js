@@ -85,13 +85,39 @@ document.addEventListener('DOMContentLoaded', () => {
             initMediaPipeHands();
             console.log("[+] Camera initialized successfully.");
 
-            // Smoothly scroll down to Biometric Palm Sensor on first page load
-            setTimeout(() => {
-                const scannerCard = document.querySelector('.scanner-card');
-                if (scannerCard) {
-                    scannerCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }, 500);
+            // Smoothly scroll down to Biometric Palm Sensor on first page load after boot completes
+            const triggerScroll = () => {
+                setTimeout(() => {
+                    const scannerCard = document.querySelector('.scanner-card');
+                    if (scannerCard) {
+                        // Calculate center position
+                        const targetY = scannerCard.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2) + (scannerCard.offsetHeight / 2);
+                        const startY = window.scrollY;
+                        const distance = targetY - startY;
+                        const durationMs = 2000; // Medium speed scroll
+                        let startTime = null;
+
+                        function step(currentTime) {
+                            if (!startTime) startTime = currentTime;
+                            const elapsed = currentTime - startTime;
+                            const progress = Math.min(elapsed / durationMs, 1);
+                            // Sinusoidal ease-in-out
+                            const ease = 0.5 - Math.cos(progress * Math.PI) / 2;
+                            window.scrollTo(0, startY + distance * ease);
+                            if (progress < 1) {
+                                requestAnimationFrame(step);
+                            }
+                        }
+                        requestAnimationFrame(step);
+                    }
+                }, 500); // 500ms delay after boot finishes
+            };
+
+            if (window.bootIsComplete) {
+                triggerScroll();
+            } else {
+                document.addEventListener('bootComplete', triggerScroll);
+            }
         } catch (err) {
             console.warn("[-] Camera access not granted or unavailable. Using simulated optical scanner.", err);
             isCameraActive = false;
