@@ -137,9 +137,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Fast, sensitive hand tracking model
             handsDetector.setOptions({
                 maxNumHands: 1,
-                modelComplexity: 0,
-                minDetectionConfidence: 0.25,
-                minTrackingConfidence: 0.25
+                modelComplexity: 1, // Increased to 1 for better accuracy
+                minDetectionConfidence: 0.7, // Increased from 0.25 to prevent false positives
+                minTrackingConfidence: 0.7   // Increased from 0.25 to prevent false positives
             });
 
             handsDetector.onResults(onHandResults);

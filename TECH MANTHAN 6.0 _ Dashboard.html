@@ -981,7 +981,7 @@ WhatsApp:
             <div style="text-align: center; margin-bottom: 18px;">
                 <div style="font-size: 2rem; margin-bottom: 4px;">💃</div>
                 <h3 class="modal-title" style="color: var(--neon-purple); font-family: &#39;Orbitron&#39;, sans-serif; font-size: 1.25rem; margin: 0;">
-                    CULTURAL EVENT REGISTRATION</h3>
+                    GROUP DANCE REGISTRATION</h3>
                 <p style="color: var(--text-sub); font-size: 0.8rem; margin-top: 4px;">Register your class performance
                     team. <strong>Min 5 to Max 10 participants allowed</strong>. Only <strong>1 team per class</strong>.
                 </p>
@@ -1039,7 +1039,7 @@ WhatsApp:
                 </div>
 
                 <button type="submit" id="btnSubmitCulturalTeam" class="cyber-btn" style="width: 100%; padding: 12px; font-weight: 800; font-family: &#39;Orbitron&#39;, sans-serif; background: var(--neon-purple); color: #fff; border: none; border-radius: 8px; font-size: 0.95rem; cursor: pointer; letter-spacing: 1px; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);">
-                    SUBMIT CULTURAL TEAM REGISTRATION
+                    SUBMIT GROUP DANCE REGISTRATION
                 </button>
             </form>
         </div>
@@ -1189,11 +1189,11 @@ WhatsApp:
 
             const eventsToHighlight = [
                 { id: 'card-coding', name: 'Coding' },
-                { id: 'card-cultural', name: 'Cultural' },
+                { id: 'card-cultural', name: 'Group Dance', phonetic: 'Group Dance' },
                 { id: 'card-gaming', name: 'Gaming' },
-                { id: 'card-it-manager', name: 'IT Manager' },
-                { id: 'card-it-melody', name: 'IT Melody' },
-                { id: 'card-it-model', name: 'IT Model' },
+                { id: 'card-it-manager', name: 'IT Manager', phonetic: 'I T Manager' },
+                { id: 'card-it-melody', name: 'IT Melody', phonetic: 'I T Melody' },
+                { id: 'card-it-model', name: 'IT Model', phonetic: 'I T Model' },
                 { id: 'card-photography', name: 'Photography' },
                 { id: 'card-poster-making', name: 'Poster Making' },
                 { id: 'card-speed-typing', name: 'Speed Typing' },
@@ -1226,7 +1226,7 @@ WhatsApp:
 
             // Initialization delay
             setTimeout(() => {
-                speak("TECH MANTHAN 6.0", () => {
+                speak("Tech Mun-thun 6 point 0", () => {
                     setTimeout(() => {
                         speak("DIVIDED BY ZERO. UNITED BY ONE.", () => {
                             startTourSequence();
@@ -1276,7 +1276,7 @@ WhatsApp:
                         moveCursorTo(evt.id);
                         
                         setTimeout(() => {
-                            speak(`Event: ${evt.name}`, () => {
+                            speak(`Event: ${evt.phonetic || evt.name}`, () => {
                                 i++;
                                 setTimeout(nextEvent, 800);
                             });
