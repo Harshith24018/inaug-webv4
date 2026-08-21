@@ -204,45 +204,118 @@ class SciFiAudioEngine {
     }
 
     // Speech Synthesis Engine — Genuine Indian Male Voice
-    speakText(text, onEnd) {
+    async speakText(text, onEnd) {
+        if (!text) {
+            if (onEnd) onEnd();
+            return;
+        }
+
+        // --- Sarvam AI TTS Configuration ---
+        // Fetch API key dynamically from local .env file
+        let SARVAM_API_KEY = '';
         try {
-            window.speechSynthesis.cancel();
-
-            const doSpeak = () => {
-                const voices = window.speechSynthesis.getVoices();
-
-                // Priority list: genuine Indian male voices (Windows + Chrome + macOS)
-                const indianMale =
-                    voices.find(v => v.name === 'Microsoft Ravi - English (India)') ||       // Windows 10/11 built-in Indian male
-                    voices.find(v => v.name === 'Microsoft Ravi Desktop - English (India)') || // Windows Desktop variant
-                    voices.find(v => v.name.includes('Ravi')) ||                              // Any Ravi
-                    voices.find(v => v.name.includes('Prabhat')) ||                           // Chrome Indian male
-                    voices.find(v => v.name.includes('en-IN') && v.name.toLowerCase().includes('male')) ||
-                    voices.find(v => v.lang === 'en-IN' && !v.name.toLowerCase().includes('heera') && !v.name.toLowerCase().includes('female')) || // en-IN, exclude female
-                    voices.find(v => v.lang === 'en-IN');                                     // Any Indian English as last resort
-
-                const utterance = new SpeechSynthesisUtterance(text);
-                if (indianMale) utterance.voice = indianMale;
-                utterance.lang = 'en-IN';
-                utterance.rate = 0.88;
-                utterance.pitch = 0.85;
-                utterance.volume = 1.0;
-                utterance.onend = () => { if (onEnd) onEnd(); };
-                utterance.onerror = () => { if (onEnd) onEnd(); };
-                window.speechSynthesis.speak(utterance);
-            };
-
-            // Voices may not be loaded yet — wait if needed
-            if (window.speechSynthesis.getVoices().length > 0) {
-                doSpeak();
-            } else {
-                window.speechSynthesis.onvoiceschanged = () => {
-                    window.speechSynthesis.onvoiceschanged = null;
-                    doSpeak();
-                };
+            const envRes = await fetch('/.env');
+            const envText = await envRes.text();
+            const match = envText.match(/SARVAM_API_KEY=(.*)/);
+            if (match && match[1]) {
+                SARVAM_API_KEY = match[1].trim();
             }
         } catch (e) {
-            if (onEnd) onEnd();
+            console.warn("Could not fetch .env file:", e);
+        }
+
+        const SPEAKER_NAME = 'anushka'; // Try 'anushka' (female) or 'shubh' (male)
+
+        const fallbackToBrowserTTS = () => {
+            try {
+                window.speechSynthesis.cancel();
+                const doSpeak = () => {
+                    const voices = window.speechSynthesis.getVoices();
+                    const bestVoice =
+                        voices.find(v => v.name === 'Google US English') ||
+                        voices.find(v => v.name === 'Google UK English Female') ||
+                        voices.find(v => v.name === 'Google UK English Male') ||
+                        voices.find(v => v.name.includes('Natural') && v.lang.startsWith('en')) ||
+                        voices.find(v => v.name.includes('Online') && v.lang.startsWith('en')) ||
+                        voices.find(v => v.lang === 'en-US') ||
+                        voices.find(v => v.lang.startsWith('en'));
+
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    if (bestVoice) {
+                        utterance.voice = bestVoice;
+                        utterance.lang = bestVoice.lang;
+                    } else {
+                        utterance.lang = 'en-US';
+                    }
+                    utterance.rate = 0.95;
+                    utterance.pitch = 1.0;
+                    utterance.volume = 1.0;
+                    utterance.onend = () => { if (onEnd) onEnd(); };
+                    utterance.onerror = () => { if (onEnd) onEnd(); };
+                    window.speechSynthesis.speak(utterance);
+                };
+
+                if (window.speechSynthesis.getVoices().length > 0) {
+                    doSpeak();
+                } else {
+                    window.speechSynthesis.onvoiceschanged = () => {
+                        window.speechSynthesis.onvoiceschanged = null;
+                        doSpeak();
+                    };
+                }
+            } catch (e) {
+                console.error("Browser TTS fallback failed:", e);
+                if (onEnd) onEnd();
+            }
+        };
+
+        if (!SARVAM_API_KEY || SARVAM_API_KEY === 'PASTE_SARVAM_API_KEY_HERE') {
+            console.warn("Sarvam API Key not found in .env. Falling back to browser TTS.");
+            return fallbackToBrowserTTS();
+        }
+
+        try {
+            const payload = {
+                text: text,
+                model: "bulbul:v3",
+                language_code: "en-IN",
+                speaker: SPEAKER_NAME,
+                pace: 1.0,
+                speech_sample_rate: 8000
+            };
+
+            const response = await fetch('https://api.sarvam.ai/text-to-speech', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'api-subscription-key': SARVAM_API_KEY,
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            if (!response.ok) throw new Error("Sarvam API HTTP error: " + response.status);
+            const data = await response.json();
+            
+            if (data && data.audios) {
+                const base64Audio = Array.isArray(data.audios) ? data.audios[0] : data.audios;
+                if (base64Audio) {
+                    const audio = new Audio("data:audio/wav;base64," + base64Audio);
+                    audio.onended = () => { if (onEnd) onEnd(); };
+                    audio.play().catch(e => {
+                        console.error("Failed to play Sarvam audio:", e);
+                        fallbackToBrowserTTS();
+                    });
+                } else {
+                    console.error("Sarvam API returned invalid audios data:", data);
+                    fallbackToBrowserTTS();
+                }
+            } else {
+                console.error("Sarvam API returned invalid data:", data);
+                fallbackToBrowserTTS();
+            }
+        } catch (err) {
+            console.error("Sarvam API request failed:", err);
+            fallbackToBrowserTTS();
         }
     }
 
