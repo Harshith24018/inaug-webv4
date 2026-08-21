@@ -255,39 +255,39 @@ class SciFiAudioEngine {
                 delay: 1000
             },
             {
-                speech: "Step 3: Unveil Website and Smooth Scroll down to the Events Directory.",
-                display: "📜 STEP 3: UNVEIL WEBSITE & SMOOTH SCROLL TO EVENTS DIRECTORY",
+                speech: "Welcome to the official Tech Manthan 6.0 mainframe. Let's explore the flagship events.",
+                display: "🌐 WELCOME TO THE TECH MANTHAN 6.0 MAINFRAME",
                 triggerScrollEvents: true,
                 cursor: { x: 50, y: 40, label: "EVENTS DIRECTORY" },
                 delay: 1200
             },
             {
-                speech: "1. Coding: Create your own world. Solve algorithmic puzzles and write clean code to win the ultimate prize.",
-                display: "1. 🎮 Coding: \"Create your own world. Solve algorithmic puzzles and write clean code to win the ultimate prize.\"",
-                cursor: { x: 28, y: 38, label: "1. 🎮 CODING" },
+                speech: "First up, Coding. Create your own world. Solve algorithmic puzzles and write clean code to win the ultimate prize.",
+                display: "🎮 CODING: \"Create your own world. Solve algorithmic puzzles and write clean code to win the ultimate prize.\"",
+                cursor: { x: 28, y: 38, label: "🎮 CODING" },
                 delay: 800
             },
             {
-                speech: "2. Group Dance: Your time to shine. Showcase technical skits, digital presentations, or creative dances.",
-                display: "2. 💃 Group Dance: \"Your time to shine. Showcase technical skits, digital presentations, or creative dances.\"",
-                cursor: { x: 72, y: 38, label: "2. 💃 GROUP DANCE" },
+                speech: "Next, Group Dance. Your time to shine. Showcase technical skits, digital presentations, or creative dances.",
+                display: "💃 GROUP DANCE: \"Your time to shine. Showcase technical skits, digital presentations, or creative dances.\"",
+                cursor: { x: 72, y: 38, label: "💃 GROUP DANCE" },
                 delay: 800
             },
             {
-                speech: "3. Gaming: Show the spirit. Compete head-to-head in competitive multiplayer tournaments.",
-                display: "3. 🕹️ Gaming: \"Show the spirit. Compete head-to-head in competitive multiplayer tournaments.\"",
-                cursor: { x: 28, y: 72, label: "3. 🕹️ GAMING" },
+                speech: "Then, Gaming. Show the spirit. Compete head-to-head in competitive multiplayer tournaments.",
+                display: "🕹️ GAMING: \"Show the spirit. Compete head-to-head in competitive multiplayer tournaments.\"",
+                cursor: { x: 28, y: 72, label: "🕹️ GAMING" },
                 delay: 800
             },
             {
-                speech: "4. Best I T Manager: Corporate tech survival. Test your management, crisis resolution, and executive pitching skills.",
-                display: "4. 👔 Best IT Manager: \"Corporate tech survival. Test your management, crisis resolution, and executive pitching skills.\"",
-                cursor: { x: 72, y: 72, label: "4. 👔 BEST IT MANAGER" },
+                speech: "Finally, Best I T Manager. Corporate tech survival. Test your management, crisis resolution, and executive pitching skills.",
+                display: "👔 BEST IT MANAGER: \"Corporate tech survival. Test your management, crisis resolution, and executive pitching skills.\"",
+                cursor: { x: 72, y: 72, label: "👔 BEST IT MANAGER" },
                 delay: 800
             },
             {
                 speech: "Detailed guidelines will be announced later. All the best to all teams!",
-                display: "Step 5: Concluding Announcement 🔊 \"Detailed guidelines will be announced later. All the best to all teams!\"",
+                display: "🔊 CONCLUDING ANNOUNCEMENT: \"Detailed guidelines will be announced later. All the best to all teams!\"",
                 triggerScrollTop: true,
                 cursor: { x: 50, y: 20, label: "CONCLUDING ANNOUNCEMENT" },
                 delay: 1500

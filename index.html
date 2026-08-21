@@ -203,6 +203,7 @@
                 <div class="scan-progress-wrapper">
                     <div class="progress-labels">
                         <span>AUTHENTICATION PROTOCOL (2.0s)</span>
+                        <span id="multi-scan-status" style="color: var(--neon-cyan); margin-left: 10px; font-weight: 700; display: none;">[ 0 / 1 SCANS VERIFIED ]</span>
                         <span id="progress-percent">0%</span>
                     </div>
                     <div class="progress-track">
@@ -278,6 +279,18 @@
     </div>
 
     <!-- ═══════ SCRIPTS ═══════ -->
+    <script>
+        // Listen for "/setting" shortcut to open configuration page
+        let typingBuffer = '';
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            typingBuffer += e.key;
+            if (typingBuffer.length > 10) typingBuffer = typingBuffer.slice(-10);
+            if (typingBuffer.includes('/setting')) {
+                window.location.href = 'settings.html';
+            }
+        });
+    </script>
     <script src="bootsequence.js"></script>
     <script src="particles.js"></script>
     <script src="audio.js"></script>

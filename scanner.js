@@ -49,6 +49,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastScanTimestamp = null;
     const TOTAL_SCAN_DURATION_MS = 2000; // Palm reading duration: Exactly 2 seconds
 
+    // Multi-Palm Settings
+    let requiredPalms = parseInt(localStorage.getItem('bioRequiredPalms') || '1');
+    let delayBetweenPalms = parseInt(localStorage.getItem('bioDelayTime') || '3');
+    let currentPalms = 0;
+    let inDelayState = false;
+    const multiScanStatus = document.getElementById('multi-scan-status');
+    if (multiScanStatus && requiredPalms > 1) {
+        multiScanStatus.style.display = 'inline';
+        multiScanStatus.innerText = `[ 0 / ${requiredPalms} SCANS VERIFIED ]`;
+    }
+
     // Initialize Audio on First User Interaction
     const unlockAudio = () => {
         audio.startAmbientDrone();
@@ -186,20 +197,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    let lastHandSeenTime = 0; // Added for grace period
+    let lastValidPalmTime = 0; // Added for grace period
+
+    // Helper to check if hand is an open palm
+    function isOpenPalm(landmarks) {
+        const dist = (p1, p2) => Math.hypot(p1.x - p2.x, p1.y - p2.y);
+        const wrist = landmarks[0];
+        
+        // A finger is extended if its tip is further from the wrist than its PIP joint.
+        const isExtended = (tip, pip) => dist(wrist, landmarks[tip]) > dist(wrist, landmarks[pip]);
+        
+        let openFingers = 0;
+        if (isExtended(8, 6)) openFingers++;   // Index
+        if (isExtended(12, 10)) openFingers++; // Middle
+        if (isExtended(16, 14)) openFingers++; // Ring
+        if (isExtended(20, 18)) openFingers++; // Pinky
+        
+        return openFingers >= 3; // Require at least 3 fingers to be open
+    }
 
     function onHandResults(results) {
-        if (!ctx || isRevealed) return;
+        if (!ctx || isRevealed || inDelayState) return;
 
         if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             handDetected = true;
-            lastHandSeenTime = performance.now();
             handLandmarks = results.multiHandLandmarks[0];
             drawCyberHand(handLandmarks);
             
-            // Once palm is shown, trigger lock-on scan process
-            triggerPalmScanLockOn();
+            // Check if it's a valid open palm gesture
+            if (isOpenPalm(handLandmarks)) {
+                lastValidPalmTime = performance.now();
+                triggerPalmScanLockOn();
+            } else {
+                // Hand is detected but NOT an open palm. Use grace period to avoid jitter.
+                if (isPalmScanLocked && !isRevealed) {
+                    if (performance.now() - lastValidPalmTime > 500) {
+                        abortPalmScan();
+                    }
+                }
+            }
         } else {
             handDetected = false;
             handLandmarks = null;
@@ -207,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // If we were locked on, but the hand disappears, wait 500ms before aborting 
             // (MediaPipe often drops single frames, this prevents it from being impossible)
             if (isPalmScanLocked && !isRevealed) {
-                if (performance.now() - lastHandSeenTime > 500) {
+                if (performance.now() - lastValidPalmTime > 500) {
                     abortPalmScan();
                 }
             }
@@ -408,8 +445,52 @@ document.addEventListener('DOMContentLoaded', () => {
         if (scanProgress < 100) {
             requestAnimationFrame(runContinuousScanLoop);
         } else {
-            triggerGrandReveal();
+            currentPalms++;
+            if (currentPalms < requiredPalms) {
+                triggerPartialSuccess();
+            } else {
+                if (multiScanStatus) multiScanStatus.innerText = `[ ${currentPalms} / ${requiredPalms} SCANS VERIFIED ]`;
+                triggerGrandReveal();
+            }
         }
+    }
+
+    function triggerPartialSuccess() {
+        if (isRevealed) return;
+        
+        inDelayState = true;
+        isPalmScanLocked = false;
+        scanProgress = 100;
+        updateProgressUI();
+        
+        audio.playLockOnSound(); // Confirmation beep
+        
+        const remaining = requiredPalms - currentPalms;
+        if (audio && remaining > 0) {
+            audio.speakText(remaining.toString());
+        }
+        
+        if (telemetryStatus) {
+            telemetryStatus.innerText = `SCAN ${currentPalms} OF ${requiredPalms} COMPLETE!`;
+        }
+        if (multiScanStatus) {
+            multiScanStatus.innerText = `[ ${currentPalms} / ${requiredPalms} SCANS VERIFIED ]`;
+        }
+        
+        if (palmGuide) palmGuide.classList.remove('scanning');
+        if (officialLogo) officialLogo.classList.remove('scanning-pulse');
+        particles.setVortex(false, 1);
+        
+        setTimeout(() => {
+            if (isRevealed) return;
+            scanProgress = 0;
+            updateProgressUI();
+            inDelayState = false;
+            
+            if (telemetryStatus) {
+                telemetryStatus.innerText = "READY FOR NEXT PALM";
+            }
+        }, delayBetweenPalms * 1000);
     }
 
     function updateProgressUI() {
@@ -487,7 +568,9 @@ document.addEventListener('DOMContentLoaded', () => {
         instantRevealBtn.addEventListener('click', () => {
             audio.init();
             scanProgress = 100;
+            currentPalms = requiredPalms;
             updateProgressUI();
+            if (multiScanStatus) multiScanStatus.innerText = `[ ${currentPalms} / ${requiredPalms} SCANS VERIFIED ]`;
             triggerGrandReveal();
         });
     }
@@ -498,7 +581,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isRevealed) {
                 e.preventDefault();
                 scanProgress = 100;
+                currentPalms = requiredPalms;
                 updateProgressUI();
+                if (multiScanStatus) multiScanStatus.innerText = `[ ${currentPalms} / ${requiredPalms} SCANS VERIFIED ]`;
                 triggerGrandReveal();
             }
         } else if (e.key === 'f' || e.key === 'F') {
@@ -587,10 +672,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 audio.speakText("ACCESS GRANTED. REDIRECTING TO TECH MANTHAN 6.0 MAINFRAME.");
             }
 
-            // Wait 4 seconds for user to see the success screen, then redirect
+            // Wait 7 seconds for the voice to finish speaking and user to see the success screen, then redirect
             setTimeout(() => {
-                window.location.href = "TECH MANTHAN 6.0 _ Dashboard.html"; 
-            }, 4000);
+                window.location.href = "TECH MANTHAN 6.0 _ Dashboard.html?v=" + new Date().getTime(); 
+            }, 7000);
             
         }, 600);
     }

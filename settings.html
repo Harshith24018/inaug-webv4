@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner Configuration - Tech Manthan 6.0</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="TM6_logo.png">
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        .settings-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 600px;
+            background: rgba(0, 15, 30, 0.85);
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+            padding: 40px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .settings-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+            padding-bottom: 20px;
+        }
+
+        .settings-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue);
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--neon-cyan);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: #fff;
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            border-radius: 6px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 35px;
+        }
+
+        .settings-actions button {
+            flex: 1;
+            padding: 15px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        .btn-save {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+        }
+
+        .btn-save:hover {
+            background: #fff;
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.8);
+        }
+
+        .btn-back {
+            background: transparent;
+            color: var(--neon-blue);
+            border: 1px solid var(--neon-blue) !important;
+        }
+
+        .btn-back:hover {
+            background: rgba(0, 243, 255, 0.1);
+        }
+
+        .save-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--neon-green);
+            color: #000;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+        }
+
+        .save-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- ═══════ LAYERED BACKGROUND ═══════ -->
+    <div class="aurora-layer"></div>
+    <div class="cyber-grid"></div>
+    <div class="cyber-vignette"></div>
+
+    <div class="save-toast" id="saveToast">CONFIGURATION SAVED</div>
+
+    <div class="settings-container">
+        <div class="settings-header">
+            <h2>BIOMETRIC CONFIGURATION</h2>
+        </div>
+
+        <div class="form-group">
+            <label for="requiredPalms">REQUIRED PALM SCANS (PEOPLE)</label>
+            <input type="number" id="requiredPalms" min="1" max="100" value="1">
+        </div>
+
+        <div class="form-group">
+            <label for="delayTime">DELAY BETWEEN SCANS (SECONDS)</label>
+            <input type="number" id="delayTime" min="0" max="60" value="3">
+        </div>
+
+        <div class="settings-actions">
+            <button class="btn-back" id="btnBack">BACK TO SYSTEM</button>
+            <button class="btn-save" id="btnSave">SAVE & INITIALIZE</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const requiredPalmsInput = document.getElementById('requiredPalms');
+            const delayTimeInput = document.getElementById('delayTime');
+            const btnSave = document.getElementById('btnSave');
+            const btnBack = document.getElementById('btnBack');
+            const toast = document.getElementById('saveToast');
+
+            // Load existing
+            const savedPalms = localStorage.getItem('bioRequiredPalms');
+            const savedDelay = localStorage.getItem('bioDelayTime');
+
+            if (savedPalms) requiredPalmsInput.value = savedPalms;
+            if (savedDelay) delayTimeInput.value = savedDelay;
+
+            // Save
+            btnSave.addEventListener('click', () => {
+                localStorage.setItem('bioRequiredPalms', requiredPalmsInput.value);
+                localStorage.setItem('bioDelayTime', delayTimeInput.value);
+                
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2000);
+            });
+
+            // Back
+            btnBack.addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>
