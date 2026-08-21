@@ -1365,11 +1365,13 @@ WhatsApp:
                     } else {
                         // Tour finished
                         cursor.classList.remove('active');
-                        speak("Thank you", () => {
-                            setTimeout(() => {
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }, 1000);
-                        });
+                        setTimeout(() => {
+                            speak("Thank you.", () => {
+                                setTimeout(() => {
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }, 1000);
+                            });
+                        }, 600);
                     }
                 }
 

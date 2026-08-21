@@ -701,13 +701,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (audio) {
-                audio.speakText("ACCESS GRANTED. REDIRECTING TO TECH MANTHAN 6.0 MAINFRAME IN 3... 2... 1...");
+                audio.speakText("ACCESS GRANTED. REDIRECTING TO TECH MANTHAN 6.0 MAINFRAME.");
             }
 
-            // Wait 7 seconds for the voice to finish speaking and user to see the success screen, then redirect
+            // Wait 10 seconds for the voice to finish speaking and user to see the success screen, then redirect
             setTimeout(() => {
                 window.location.href = "TECH MANTHAN 6.0 _ Dashboard.html?v=" + new Date().getTime(); 
-            }, 7000);
+            }, 10000);
             
         }, 600);
     }
