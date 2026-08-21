@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Multi-Palm Settings
     let requiredPalms = parseInt(localStorage.getItem('bioRequiredPalms') || '1');
-    let delayBetweenPalms = parseInt(localStorage.getItem('bioDelayTime') || '3');
+    let delayBetweenPalms = parseFloat(localStorage.getItem('bioDelayTime') || '1.5');
     let currentPalms = 0;
     let inDelayState = false;
     const multiScanStatus = document.getElementById('multi-scan-status');
@@ -491,6 +491,13 @@ document.addEventListener('DOMContentLoaded', () => {
             audio.speakText(remaining.toString());
         }
         
+        const overlay = document.getElementById('fullscreen-countdown-overlay');
+        const overlayText = document.getElementById('countdown-overlay-text');
+        if (overlay && overlayText && remaining > 0) {
+            overlayText.innerText = remaining.toString();
+            overlay.classList.add('active');
+        }
+        
         if (telemetryStatus) {
             telemetryStatus.innerText = `SCAN ${currentPalms} OF ${requiredPalms} COMPLETE!`;
         }
@@ -503,6 +510,9 @@ document.addEventListener('DOMContentLoaded', () => {
         particles.setVortex(false, 1);
         
         setTimeout(() => {
+            const overlay = document.getElementById('fullscreen-countdown-overlay');
+            if (overlay) overlay.classList.remove('active');
+            
             if (isRevealed) return;
             scanProgress = 0;
             updateProgressUI();

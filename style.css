@@ -1358,3 +1358,38 @@ body.booting .top-hud-bar, body.booting .main-stage {
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
+/* Fullscreen Countdown Overlay */
+.countdown-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 5, 15, 0.9);
+    backdrop-filter: blur(15px);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+.countdown-overlay.active {
+    display: flex;
+}
+#countdown-overlay-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 35vw;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 
+        0 0 20px var(--cyan),
+        0 0 50px var(--cyan),
+        0 0 100px rgba(0, 229, 255, 0.6),
+        0 0 150px rgba(0, 229, 255, 0.3);
+    line-height: 1;
+    animation: pulseGiantNumber 0.8s ease-in-out infinite alternate;
+}
+@keyframes pulseGiantNumber {
+    from { transform: scale(0.9); opacity: 0.8; }
+    to { transform: scale(1.1); opacity: 1; filter: brightness(1.3); }
+}
