@@ -100,6 +100,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Smoothly scroll down to Biometric Palm Sensor on first page load after boot completes
             const triggerScroll = () => {
                 setTimeout(() => {
+                    if (window.scrollY > 50) return; // Abort if user already scrolled down manually
+                    
                     const scannerCard = document.querySelector('.scanner-card');
                     if (scannerCard) {
                         // Calculate center position
