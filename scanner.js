@@ -47,7 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let handLandmarks = null;
     let manualScanInterval = null;
     let lastScanTimestamp = null;
-    const TOTAL_SCAN_DURATION_MS = 2000; // Palm reading duration: Exactly 2 seconds
+    const TOTAL_SCAN_DURATION_MS = 3000; // Palm reading duration: Exactly 3 seconds
+    let lastSpokenCountdown = null;
 
     // Multi-Palm Settings
     let requiredPalms = parseInt(localStorage.getItem('bioRequiredPalms') || '1');
@@ -216,6 +217,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return openFingers >= 3; // Require at least 3 fingers to be open
     }
 
+    // Helper to check if hand is showing a Thumbs Up
+    function isThumbsUp(landmarks) {
+        const dist = (p1, p2) => Math.hypot(p1.x - p2.x, p1.y - p2.y);
+        const wrist = landmarks[0];
+        const isExtended = (tip, pip) => dist(wrist, landmarks[tip]) > dist(wrist, landmarks[pip]);
+        
+        let openFingers = 0;
+        if (isExtended(8, 6)) openFingers++;
+        if (isExtended(12, 10)) openFingers++;
+        if (isExtended(16, 14)) openFingers++;
+        if (isExtended(20, 18)) openFingers++;
+        
+        const isThumbExtended = isExtended(4, 2);
+        return isThumbExtended && openFingers <= 1;
+    }
+
     function onHandResults(results) {
         if (!ctx || isRevealed || inDelayState) return;
 
@@ -225,8 +242,8 @@ document.addEventListener('DOMContentLoaded', () => {
             handLandmarks = results.multiHandLandmarks[0];
             drawCyberHand(handLandmarks);
             
-            // Check if it's a valid open palm gesture
-            if (isOpenPalm(handLandmarks)) {
+            // Check if it's a valid thumbs up gesture
+            if (isThumbsUp(handLandmarks)) {
                 lastValidPalmTime = performance.now();
                 triggerPalmScanLockOn();
             } else {
@@ -402,6 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isRevealed || isPalmScanLocked) return;
         isPalmScanLocked = true;
         lastScanTimestamp = performance.now();
+        lastSpokenCountdown = null;
         audio.init();
 
         if (palmGuide) palmGuide.classList.add('scanning');
@@ -416,6 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isRevealed) return;
         isPalmScanLocked = false;
         scanProgress = 0;
+        lastSpokenCountdown = null;
         updateProgressUI();
         if (palmGuide) palmGuide.classList.remove('scanning');
         if (officialLogo) officialLogo.classList.remove('scanning-pulse');
@@ -442,6 +461,8 @@ document.addEventListener('DOMContentLoaded', () => {
             lastScanChirpTime = timeNow;
         }
 
+        // Countdown logic removed per user request
+
         if (scanProgress < 100) {
             requestAnimationFrame(runContinuousScanLoop);
         } else {
@@ -449,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentPalms < requiredPalms) {
                 triggerPartialSuccess();
             } else {
-                if (multiScanStatus) multiScanStatus.innerText = `[ ${currentPalms} / ${requiredPalms} SCANS VERIFIED ]`;
+                if (multiScanStatus) multiScanStatus.innerText = `[ 0 SCANS REMAINING ]`;
                 triggerGrandReveal();
             }
         }
@@ -474,7 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
             telemetryStatus.innerText = `SCAN ${currentPalms} OF ${requiredPalms} COMPLETE!`;
         }
         if (multiScanStatus) {
-            multiScanStatus.innerText = `[ ${currentPalms} / ${requiredPalms} SCANS VERIFIED ]`;
+            multiScanStatus.innerText = `[ ${requiredPalms - currentPalms} SCANS REMAINING ]`;
         }
         
         if (palmGuide) palmGuide.classList.remove('scanning');
@@ -495,20 +516,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateProgressUI() {
         const rounded = Math.round(scanProgress);
-        const elapsedSec = ((scanProgress / 100) * 2.0).toFixed(1);
+        const elapsedSec = ((scanProgress / 100) * 3.0).toFixed(1);
         if (progressFill) progressFill.style.width = `${rounded}%`;
-        if (progressPercent) progressPercent.innerText = `${rounded}%`;
+        
+        if (progressPercent) {
+            if (!isPalmScanLocked && rounded === 0 && currentPalms > 0 && currentPalms < requiredPalms) {
+                progressPercent.innerText = `${requiredPalms - currentPalms}`;
+            } else {
+                progressPercent.innerText = `${rounded}%`;
+            }
+        }
 
         // Telemetry readout
         if (telemetryStatus) {
             if (!isPalmScanLocked && rounded === 0) {
-                telemetryStatus.innerText = "WAITING FOR PALM... // SHOW PALM TO SCAN";
+                if (currentPalms > 0 && currentPalms < requiredPalms) {
+                    telemetryStatus.innerText = `WAITING FOR PALM... // ${requiredPalms - currentPalms} SCANS REMAINING`;
+                } else {
+                    telemetryStatus.innerText = "WAITING FOR PALM... // SHOW PALM TO SCAN";
+                }
             } else if (rounded < 35) {
-                telemetryStatus.innerText = `PALM DETECTED // SCANNING TOPOLOGY... [${elapsedSec}s / 2.0s]`;
+                telemetryStatus.innerText = `PALM DETECTED // SCANNING TOPOLOGY... [${elapsedSec}s / 3.0s]`;
             } else if (rounded < 70) {
-                telemetryStatus.innerText = `DECRYPTING BCA 6.0 KEY... [${elapsedSec}s / 2.0s]`;
+                telemetryStatus.innerText = `DECRYPTING BCA 6.0 KEY... [${elapsedSec}s / 3.0s]`;
             } else if (rounded < 100) {
-                telemetryStatus.innerText = `AUTHENTICATING SIGNATURE... [${elapsedSec}s / 2.0s]`;
+                telemetryStatus.innerText = `AUTHENTICATING SIGNATURE... [${elapsedSec}s / 3.0s]`;
             } else {
                 telemetryStatus.innerText = "PALM VERIFIED // UNLOCKING WEBSITE!";
             }
@@ -669,7 +701,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (audio) {
-                audio.speakText("ACCESS GRANTED. REDIRECTING TO TECH MANTHAN 6.0 MAINFRAME.");
+                audio.speakText("ACCESS GRANTED. REDIRECTING TO TECH MANTHAN 6.0 MAINFRAME IN 3... 2... 1...");
             }
 
             // Wait 7 seconds for the voice to finish speaking and user to see the success screen, then redirect

@@ -210,21 +210,7 @@ class SciFiAudioEngine {
             return;
         }
 
-        // --- Sarvam AI TTS Configuration ---
-        // Fetch API key dynamically from local .env file
-        let SARVAM_API_KEY = '';
-        try {
-            const envRes = await fetch('/.env');
-            const envText = await envRes.text();
-            const match = envText.match(/SARVAM_API_KEY=(.*)/);
-            if (match && match[1]) {
-                SARVAM_API_KEY = match[1].trim();
-            }
-        } catch (e) {
-            console.warn("Could not fetch .env file:", e);
-        }
-
-        const SPEAKER_NAME = 'anushka'; // Try 'anushka' (female) or 'shubh' (male)
+        const SPEAKER_NAME = 'shubh'; // Changed to male voice
 
         const fallbackToBrowserTTS = () => {
             try {
@@ -269,11 +255,6 @@ class SciFiAudioEngine {
             }
         };
 
-        if (!SARVAM_API_KEY || SARVAM_API_KEY === 'PASTE_SARVAM_API_KEY_HERE') {
-            console.warn("Sarvam API Key not found in .env. Falling back to browser TTS.");
-            return fallbackToBrowserTTS();
-        }
-
         try {
             const payload = {
                 text: text,
@@ -284,11 +265,10 @@ class SciFiAudioEngine {
                 speech_sample_rate: 8000
             };
 
-            const response = await fetch('https://api.sarvam.ai/text-to-speech', {
+            const response = await fetch('/api/tts', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'api-subscription-key': SARVAM_API_KEY,
                 },
                 body: JSON.stringify(payload)
             });
@@ -316,6 +296,53 @@ class SciFiAudioEngine {
         } catch (err) {
             console.error("Sarvam API request failed:", err);
             fallbackToBrowserTTS();
+        }
+    }
+
+    speakSystemText(text, onEnd) {
+        if (!text) {
+            if (onEnd) onEnd();
+            return;
+        }
+        try {
+            window.speechSynthesis.cancel();
+            const doSpeak = () => {
+                const voices = window.speechSynthesis.getVoices();
+                const bestVoice =
+                    voices.find(v => v.name === 'Google US English') ||
+                    voices.find(v => v.name === 'Google UK English Female') ||
+                    voices.find(v => v.name === 'Google UK English Male') ||
+                    voices.find(v => v.name.includes('Natural') && v.lang.startsWith('en')) ||
+                    voices.find(v => v.name.includes('Online') && v.lang.startsWith('en')) ||
+                    voices.find(v => v.lang === 'en-US') ||
+                    voices.find(v => v.lang.startsWith('en'));
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                if (bestVoice) {
+                    utterance.voice = bestVoice;
+                    utterance.lang = bestVoice.lang;
+                } else {
+                    utterance.lang = 'en-US';
+                }
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                utterance.onend = () => { if (onEnd) onEnd(); };
+                utterance.onerror = () => { if (onEnd) onEnd(); };
+                window.speechSynthesis.speak(utterance);
+            };
+
+            if (window.speechSynthesis.getVoices().length > 0) {
+                doSpeak();
+            } else {
+                window.speechSynthesis.onvoiceschanged = () => {
+                    window.speechSynthesis.onvoiceschanged = null;
+                    doSpeak();
+                };
+            }
+        } catch (e) {
+            console.error("Browser TTS failed:", e);
+            if (onEnd) onEnd();
         }
     }
 
@@ -364,6 +391,12 @@ class SciFiAudioEngine {
                 triggerScrollTop: true,
                 cursor: { x: 50, y: 20, label: "CONCLUDING ANNOUNCEMENT" },
                 delay: 1500
+            },
+            {
+                speech: "Thank you.",
+                display: "✨ THANK YOU",
+                cursor: { x: 50, y: 50, label: "✨ THANK YOU" },
+                delay: 1000
             }
         ];
 

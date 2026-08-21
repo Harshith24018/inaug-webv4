@@ -1,0 +1,27 @@
+{
+  "name": "web-launch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gani-ship-it/inaug-webv1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/gani-ship-it/inaug-webv1/issues"
+  },
+  "homepage": "https://github.com/gani-ship-it/inaug-webv1#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "sarvamai": "^1.1.8"
+  }
+}

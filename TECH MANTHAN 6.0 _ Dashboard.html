@@ -1225,19 +1225,7 @@ WhatsApp:
                     return;
                 }
 
-                let SARVAM_API_KEY = '';
-                try {
-                    const envRes = await fetch('/.env');
-                    const envText = await envRes.text();
-                    const match = envText.match(/SARVAM_API_KEY=(.*)/);
-                    if (match && match[1]) {
-                        SARVAM_API_KEY = match[1].trim();
-                    }
-                } catch (e) {
-                    console.warn("Could not fetch .env file:", e);
-                }
-
-                const SPEAKER_NAME = 'anushka'; // Try 'anushka' (female) or 'shubh' (male)
+                const SPEAKER_NAME = 'shubh'; // Changed to male voice
 
                 const fallbackToBrowserTTS = () => {
                     try {
@@ -1272,11 +1260,6 @@ WhatsApp:
                     }
                 };
 
-                if (!SARVAM_API_KEY || SARVAM_API_KEY === 'PASTE_SARVAM_API_KEY_HERE') {
-                    console.warn("Sarvam API Key not found in .env. Falling back to browser TTS.");
-                    return fallbackToBrowserTTS();
-                }
-
                 const payload = {
                     text: text,
                     model: "bulbul:v3",
@@ -1286,10 +1269,9 @@ WhatsApp:
                     speech_sample_rate: 8000
                 };
 
-                fetch('https://api.sarvam.ai/text-to-speech', {
+                fetch('/api/tts', {
                     method: 'POST',
                     headers: {
-                        'api-subscription-key': SARVAM_API_KEY,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(payload)
@@ -1374,7 +1356,7 @@ WhatsApp:
                         moveCursorTo(evt.id);
                         
                         setTimeout(() => {
-                            speak(`Event: ${evt.phonetic || evt.name}`, () => {
+                            speak(evt.phonetic || evt.name, () => {
                                 i++;
                                 setTimeout(nextEvent, 800);
                             });
@@ -1383,9 +1365,11 @@ WhatsApp:
                     } else {
                         // Tour finished
                         cursor.classList.remove('active');
-                        setTimeout(() => {
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }, 1000);
+                        speak("Thank you", () => {
+                            setTimeout(() => {
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }, 1000);
+                        });
                     }
                 }
 
