@@ -204,7 +204,7 @@ class SciFiAudioEngine {
     }
 
     // Speech Synthesis Engine — Genuine Indian Male Voice
-    async speakText(text, onEnd) {
+    async speakText(text, onEnd, pace = 1.0) {
         if (!text) {
             if (onEnd) onEnd();
             return;
@@ -261,7 +261,7 @@ class SciFiAudioEngine {
                 model: "bulbul:v3",
                 language_code: "en-IN",
                 speaker: SPEAKER_NAME,
-                pace: 1.0,
+                pace: pace,
                 speech_sample_rate: 8000
             };
 
@@ -349,10 +349,11 @@ class SciFiAudioEngine {
     startCeremonyVoiceTour(onStepCallback, onScrollToEventsCallback, onScrollToTopCallback, onCursorMoveCallback) {
         const tourSteps = [
             {
-                speech: "TECH MANTHAN 6.0 — DIVIDED BY ZERO, UNITED BY ONE.",
+                speech: "TECH MANTHAN 6.0. Divided by zero, United by one.",
                 display: "🚀 TECH MANTHAN 6.0 — DIVIDED BY ZERO, UNITED BY ONE.",
                 cursor: { x: 50, y: 25, label: "TECH MANTHAN 6.0" },
-                delay: 1000
+                delay: 1000,
+                pace: 0.8
             },
             {
                 speech: "Welcome to the official Tech Manthan 6.0 mainframe. Let's explore the flagship events.",
@@ -427,7 +428,7 @@ class SciFiAudioEngine {
                 if (currentStep < tourSteps.length) {
                     setTimeout(processNextStep, step.delay || 800);
                 }
-            });
+            }, step.pace || 1.0);
         };
 
         if ('speechSynthesis' in window && window.speechSynthesis.getVoices().length === 0) {
